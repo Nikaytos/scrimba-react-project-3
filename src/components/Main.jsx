@@ -7,18 +7,27 @@ export default function Main() {
     const [ingredients, setIngredients] = useState([])
     const [recipeShown, setRecipeShown] = useState(false);
     const [aiText, setAiText] = useState("");
+    const [responseLoading, setResponseLoading] = useState(false);
 
     function addIngredient(formData) {
-        const newIngredient = formData.get("ingredient")
+        const newIngredient = formData.get("ingredient").trim();
+        if (!newIngredient) return;
         setIngredients(prevIngredients => [...prevIngredients, newIngredient])
     }
 
+    function removeIngredient(index) {
+        setIngredients(prevIngredients =>
+            prevIngredients.filter((_, i) => i !== index)
+        );
+    }
+
     async function getRecipe() {
+        setResponseLoading(true);
         const aiText = await getRecipeFromMistral(ingredients);
+        setResponseLoading(false);
 
         setAiText(aiText);
-
-        setRecipeShown(true)
+        setRecipeShown(true);
     }
 
     return (
@@ -35,6 +44,8 @@ export default function Main() {
             {!!ingredients.length && <IngredientsList
                 ingredients={ingredients}
                 getRecipe={getRecipe}
+                getRecipeDisabled={responseLoading}
+                removeIngredient={removeIngredient}
             />}
             {recipeShown && <ClaudeRecipe text={aiText} />}
         </main>
