@@ -4,9 +4,7 @@ import IngredientsList from "./IngredientsList.jsx";
 import {getRecipeFromMistral} from "../ai.js";
 
 export default function Main() {
-    const [ingredients, setIngredients] = useState(
-        ["all the main spices", "pasta", "ground beef", "tomato paste"]
-    )
+    const [ingredients, setIngredients] = useState([])
     const [recipeShown, setRecipeShown] = useState(false);
     const [aiText, setAiText] = useState("");
 
@@ -15,7 +13,7 @@ export default function Main() {
         setIngredients(prevIngredients => [...prevIngredients, newIngredient])
     }
 
-    async function toggleRecipeShown() {
+    async function getRecipe() {
         const aiText = await getRecipeFromMistral(ingredients);
 
         setAiText(aiText);
@@ -36,7 +34,7 @@ export default function Main() {
             </form>
             {!!ingredients.length && <IngredientsList
                 ingredients={ingredients}
-                toggleRecipeShown={toggleRecipeShown}
+                getRecipe={getRecipe}
             />}
             {recipeShown && <ClaudeRecipe text={aiText} />}
         </main>
