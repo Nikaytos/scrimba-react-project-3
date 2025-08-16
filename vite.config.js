@@ -5,4 +5,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/scrimba-react-project-3/',
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true
+      }
+    }
+  }
 })
