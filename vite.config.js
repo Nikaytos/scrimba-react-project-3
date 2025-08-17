@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/scrimba-react-project-3/',
+  base: '/chef-claude-srp3/',
   plugins: [react()],
   server: {
     proxy: {
