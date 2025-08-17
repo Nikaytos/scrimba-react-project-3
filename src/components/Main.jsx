@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import ClaudeRecipe from "./ClaudeRecipe.jsx";
 import IngredientsList from "./IngredientsList.jsx";
 import {getRecipeFromMistral} from "../ai.js";
@@ -6,13 +6,19 @@ import CodewordInput from "./CodewordInput.jsx";
 
 export default function Main() {
     const [ingredients, setIngredients] = useState([])
-    const [recipeShown, setRecipeShown] = useState(false);
-    const [aiText, setAiText] = useState("");
+    const [recipe, setRecipe] = useState("");
     const [responseLoading, setResponseLoading] = useState(false);
+    const recipeSection = useRef(null);
 
     const [codeword, setCodeword] = useState("");
     const [codeStatus, setCodeStatus] = useState(null);
     const isAccessOk = !!codeword.trim() && codeStatus === "ok";
+
+    useEffect(() => {
+        if (recipe && recipeSection.current) {
+            recipeSection.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [recipe])
 
     function addIngredient(formData) {
         if (!isAccessOk) return;
@@ -30,8 +36,7 @@ export default function Main() {
         setResponseLoading(true);
         try {
             const text = await getRecipeFromMistral(ingredients, codeword);
-            setAiText(text);
-            setRecipeShown(true);
+            setRecipe(text);
         } catch (e) {
             alert(e.message || "Request failed");
         } finally {
@@ -61,13 +66,14 @@ export default function Main() {
             </form>
 
             {!!ingredients.length && <IngredientsList
+                ref={recipeSection}
                 ingredients={ingredients}
                 getRecipe={getRecipe}
                 getRecipeDisabled={responseLoading || !isAccessOk}
                 removeIngredient={removeIngredient}
             />}
 
-            {recipeShown && <ClaudeRecipe text={aiText} />}
+            {recipe && <ClaudeRecipe recipe={recipe} />}
         </main>
     )
 }
